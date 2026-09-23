@@ -1,0 +1,390 @@
+@import "tailwindcss";
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --cyan: #67e8f9;
+  --blue: #60a5fa;
+  --purple: #c084fc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(34, 211, 238, 0.045),
+      transparent 35%
+    ),
+    #050505;
+  color: var(--foreground);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+body::-webkit-scrollbar {
+  width: 7px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #030303;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    rgba(103, 232, 249, 0.35),
+    rgba(192, 132, 252, 0.3)
+  );
+  border-radius: 999px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(103, 232, 249, 0.6),
+    rgba(192, 132, 252, 0.5)
+  );
+}
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+  background: rgba(103, 232, 249, 0.2);
+  color: white;
+}
+
+/* =========================================================
+   LINKS / BUTTONS
+========================================================= */
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* =========================================================
+   PREMIUM GRADIENT TEXT
+========================================================= */
+
+.hero-gradient {
+  background:
+    linear-gradient(
+      100deg,
+      #ffffff 0%,
+      #a5f3fc 25%,
+      #67e8f9 50%,
+      #93c5fd 72%,
+      #c084fc 100%
+    );
+
+  background-size: 220% auto;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  color: transparent;
+
+  animation: gradientText 7s linear infinite;
+}
+
+@keyframes gradientText {
+  0% {
+    background-position: 0% center;
+  }
+
+  50% {
+    background-position: 100% center;
+  }
+
+  100% {
+    background-position: 0% center;
+  }
+}
+
+/* =========================================================
+   HERO GRID
+========================================================= */
+
+.hero-grid {
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 60px 60px;
+
+  mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      black 35%,
+      transparent 78%
+    );
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse at center,
+      black 0%,
+      black 35%,
+      transparent 78%
+    );
+}
+
+/* =========================================================
+   PREMIUM GLASS
+========================================================= */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* =========================================================
+   SHIMMER BORDER
+========================================================= */
+
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(103, 232, 249, 0.25),
+      transparent 80%
+    );
+
+  transform: translateX(-100%);
+  animation: shimmer 5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  60% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* =========================================================
+   FLOATING
+========================================================= */
+
+.float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* =========================================================
+   GLOW PULSE
+========================================================= */
+
+.glow-pulse {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+
+/* =========================================================
+   SCAN LINE
+========================================================= */
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(103, 232, 249, 0.65),
+      transparent
+    );
+
+  animation: scanLine 5s ease-in-out infinite;
+}
+
+@keyframes scanLine {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   MOVING LIGHT
+========================================================= */
+
+.moving-light {
+  animation: movingLight 8s linear infinite;
+}
+
+@keyframes movingLight {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid rgba(103, 232, 249, 0.8);
+  outline-offset: 4px;
+}
+
+/* =========================================================
+   DESKTOP CURSOR
+========================================================= */
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+
+  a,
+  button {
+    cursor: none;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+   MOBILE PERFORMANCE
+========================================================= */
+
+@media (max-width: 768px) {
+  .hero-grid {
+    background-size: 45px 45px;
+  }
+}
