@@ -1,2733 +1,1236 @@
 "use client";
 
 import {
-  ArrowDown,
-  ArrowRight,
-  Award,
-  Download,
-  Eye,
-  FileText,
-  BrainCircuit,
-  BriefcaseBusiness,
-  CheckCircle2,
-  Code2,
-  Database,
-  ExternalLink,
-  GraduationCap,
-  Mail,
-  MapPin,
-  Menu,
-  Monitor,
-  Network,
-  Phone,
-  Send,
-  Server,
-  Sparkles,
-  Terminal,
-  X,
-  Zap,
+  ArrowDown, ArrowRight, ArrowUpRight, Award, Check, Copy, Download, Eye, FileText,
+  BriefcaseBusiness, BrainCircuit, Code2, Database, GraduationCap, Mail, Monitor, Server, Terminal, MapPin, Menu, Phone, X,
 } from "lucide-react";
-
-import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-
+import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
-import BackgroundEffects from "../components/BackgroundEffects";
-import CustomCursor from "../components/CustomCursor";
-import ScrollProgress from "../components/ScrollProgress";
 
-/* =========================================================
-   DATA
-========================================================= */
+/* ======================= DATA ======================= */
+
+const EMAIL = "2003kumarvivek@gmail.com";
+const RESUME = "/resume/Vivek-Kumar-Resume.pdf";
+const GITHUB = "https://github.com/VIVEK6480";
+const LINKEDIN = "https://www.linkedin.com/in/vivek-kumar-7162272b3";
+const LEETCODE = "https://leetcode.com/u/6XsVSxqk70/";
+
+const navItems = [
+  ["Projects", "#projects"],
+  ["Skills", "#skills"],
+  ["Experience", "#experience"],
+  ["Education", "#education"],
+  ["Contact", "#contact"],
+] as const;
+
+const stats = [
+  ["8.63", "CGPA, B.Tech CSE"],
+  ["100+", "DSA problems solved"],
+  ["30+", "REST APIs built"],
+  ["3", "Internships"],
+] as const;
+
+/* Flagship case study */
+const flagship = {
+  title: "Automated Data Quality & Observability Platform",
+  summary:
+    "Upload a dataset and get a full health report: what is broken, what changed since last time, and the most likely cause. Built like an internal data-platform tool, not a notebook.",
+  github:
+    "https://github.com/VIVEK6480/Automated-Data-Quality-and-Data-Observability-Platform",
+  pipeline: [
+    ["Ingest", "CSV upload, schema captured and versioned in PostgreSQL"],
+    ["Profile", "Nulls, duplicates, ranges, types and distributions per column"],
+    ["Detect", "ML anomaly detection, schema drift and data drift against a baseline"],
+    ["Score", "Timeliness and quality scoring for each dataset run"],
+    ["Explain", "Root-cause report so issues can be fixed, not just flagged"],
+  ],
+  stack: ["Python", "FastAPI", "PostgreSQL", "SQLAlchemy", "Alembic", "Pandas", "scikit-learn"],
+};
 
 const projects = [
   {
-    number: "01",
     title: "CampusConnect",
-    category: "FULL-STACK PLATFORM",
+    kind: "Full-stack platform",
     description:
-      "A full-stack campus management platform connecting students, faculty and administrators through role-based workflows, attendance, clubs, events, approvals, notifications and authentication.",
-    stack: [
-      "Next.js",
-      "React",
-      "TypeScript",
-      "Prisma",
-      "PostgreSQL",
-      "Tailwind",
-      "JWT",
-    ],
+      "Campus management system for students, faculty and admins: role-based access, attendance, clubs, events, approvals and notifications.",
+    stack: ["Next.js", "TypeScript", "Prisma", "PostgreSQL", "JWT", "Tailwind"],
     github: "https://github.com/VIVEK6480/campusconnect",
-    liveDemo: "https://campusconnect-coral-one.vercel.app/",
-    featured: true,
+    live: "https://campusconnect-coral-one.vercel.app/",
   },
-
   {
-    number: "02",
+    title: "NotesHub",
+    kind: "Full-stack app",
+    description:
+      "Private notes workspace with secure login. Every user sees and manages only their own notes.",
+    stack: ["Next.js", "Node.js", "REST APIs", "Auth", "Tailwind"],
+    github: "https://github.com/VIVEK6480/NotesHub",
+    live: "https://notes-hub-frontend-eight.vercel.app",
+  },
+  {
     title: "Emotion Detection System",
-    category: "AI / COMPUTER VISION",
+    kind: "Computer vision",
     description:
-      "A real-time webcam-based facial emotion detection system using computer vision and deep learning to classify human emotions.",
-    stack: [
-      "Python",
-      "OpenCV",
-      "DeepFace",
-      "TensorFlow",
-      "NumPy",
-      "Pandas",
-    ],
+      "Reads webcam frames in real time and classifies facial emotions with a deep learning model.",
+    stack: ["Python", "OpenCV", "DeepFace", "TensorFlow", "NumPy"],
     github: "https://github.com/VIVEK6480/Emotion-Detection",
-    featured: true,
+    live: null,
   },
-
   {
-    number: "03",
     title: "Firewall Implementation",
-    category: "NETWORK SECURITY",
+    kind: "Network security · in progress",
     description:
-      "A security-focused networking project currently being developed and documented as part of the portfolio engineering work.",
-    stack: [
-      "Networking",
-      "Security",
-      "Firewall",
-      "Systems",
-    ],
+      "Packet-filtering firewall project. Rules, logging and documentation are being written up.",
+    stack: ["Networking", "Security", "Systems"],
     github: null,
-    featured: false,
-  },
-
-  {
-    number: "04",
-    title: "Data Quality & Observability",
-    category: "DATA ENGINEERING / AI",
-    description:
-      "Planned industrial platform focused on automated data-quality checks, observability signals, anomaly detection and reliable data pipelines.",
-    stack: [
-      "Python",
-      "Data Engineering",
-      "Observability",
-      "AI/ML",
-    ],
-    github: null,
-    featured: false,
-  },
-
-  {
-    number: "05",
-    title: "AI E-Commerce Platform",
-    category: "AI / FULL-STACK",
-    description:
-      "Planned AI-powered commerce platform exploring intelligent product discovery, personalized experiences and modern full-stack architecture.",
-    stack: [
-      "Next.js",
-      "React",
-      "Node.js",
-      "AI",
-      "PostgreSQL",
-    ],
-    github: null,
-    featured: false,
+    live: null,
   },
 ];
 
-/* =========================================================
-   SKILLS
-========================================================= */
-
-const skillGroups = [
-  {
-    title: "Frontend",
-    icon: Monitor,
-    skills: [
-      "React.js",
-      "Next.js",
-      "TypeScript",
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "Tailwind CSS",
-    ],
-  },
-
-  {
-    title: "Backend",
-    icon: Server,
-    skills: [
-      "Node.js",
-      "Express.js",
-      "REST APIs",
-      "JWT",
-      "bcrypt",
-      "Authentication",
-      "RBAC",
-    ],
-  },
-
-  {
-    title: "Database",
-    icon: Database,
-    skills: [
-      "PostgreSQL",
-      "Prisma ORM",
-      "Neon Database",
-      "MySQL",
-      "SQL",
-    ],
-  },
-
-  {
-    title: "AI / ML",
-    icon: BrainCircuit,
-    skills: [
-      "Artificial Intelligence",
-      "Machine Learning",
-      "Computer Vision",
-      "DeepFace",
-      "TensorFlow",
-      "OpenCV",
-    ],
-  },
-
-  {
-    title: "Languages",
-    icon: Code2,
-    skills: [
-      "C++",
-      "C",
-      "Python",
-      "JavaScript",
-      "PHP",
-    ],
-  },
-
-  {
-    title: "Tools",
-    icon: Terminal,
-    skills: [
-      "Git",
-      "GitHub",
-      "VS Code",
-      "Postman",
-      "Vercel",
-      "Render",
-      "npm",
-    ],
-  },
+const skillGroups: { title: string; skills: string[] }[] = [
+  { title: "Frontend", skills: ["React.js", "Next.js", "TypeScript", "JavaScript", "HTML", "CSS", "Tailwind CSS"] },
+  { title: "Backend", skills: ["Node.js", "Express.js", "Python", "REST APIs", "JWT", "RBAC"] },
+  { title: "Data & Databases", skills: ["PostgreSQL", "Prisma ORM", "MySQL", "SQL", "Neon Database"] },
+  { title: "AI / ML", skills: ["Machine Learning", "Computer Vision", "TensorFlow", "OpenCV", "DeepFace"] },
+  { title: "Languages", skills: ["C++", "C", "Python", "JavaScript", "PHP"] },
+  { title: "Tools", skills: ["Git", "GitHub", "VS Code", "Postman", "Vercel", "Render"] },
 ];
 
-/* =========================================================
-   TOOL / PLATFORM ICONS
-========================================================= */
-
-const skillIcons: Record<string, string> = {
-  "React.js":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
-  "Next.js":
-    "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/nextdotjs.svg",
-  TypeScript:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
-  JavaScript:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
-  HTML:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
-  CSS:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg",
-  "Tailwind CSS":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
-
-  "Node.js":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg",
-  "Express.js":
-    "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/express.svg",
-  "REST APIs":
-    "/skills/rest-apis.svg",
-  JWT:
-    "/skills/jwt.svg",
-  bcrypt:
-    "/skills/bcrypt.svg",
-  Authentication:
-    "/skills/authentication.svg",
-  RBAC:
-    "/skills/rbac.svg",
-
-  PostgreSQL:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
-  "Prisma ORM":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/prisma/prisma-original.svg",
-  "Neon Database":
-    "/skills/neon-database.svg",
-  MySQL:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
-  SQL:
-    "/skills/sql.svg",
-
-  "Artificial Intelligence":
-
-    "/skills/artificial-intelligence.svg",
-  "Machine Learning":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
-  "Computer Vision":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opencv/opencv-original.svg",
-  DeepFace:
-    "/skills/deepface.svg",
-  TensorFlow:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
-  OpenCV:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opencv/opencv-original.svg",
-
-  "C++":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
-  C:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg",
-  Python:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
-  PHP:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/php/php-original.svg",
-
-  Git:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
-  GitHub:
-    "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg",
-  "VS Code":
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg",
-  Postman:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postman/postman-original.svg",
-  Vercel:
-    "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/vercel.svg",
-  Render:
-    "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/render.svg",
-  npm:
-    "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/npm/npm-original-wordmark.svg",
+const groupIcons: Record<string, typeof Monitor> = {
+  Frontend: Monitor,
+  Backend: Server,
+  "Data & Databases": Database,
+  "AI / ML": BrainCircuit,
+  Languages: Code2,
+  Tools: Terminal,
 };
 
-/* =========================================================
-   PROGRAMMING LANGUAGES
-========================================================= */
-
-const programmingLanguages = [
-  {
-    name: "C++",
-    level: "Proficient",
-    description:
-      "Strong foundation in problem solving, DSA and object-oriented programming.",
-    icon:
-      "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
-    accent: "from-blue-400/20 to-cyan-400/5",
-  },
-  {
-    name: "C",
-    level: "Working Knowledge",
-    description:
-      "Programming fundamentals, memory concepts and structured programming.",
-    icon:
-      "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg",
-    accent: "from-slate-400/20 to-blue-400/5",
-  },
-  {
-    name: "Python",
-    level: "Working Knowledge",
-    description:
-      "Used for AI, computer vision, data processing and automation projects.",
-    icon:
-      "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
-    accent: "from-yellow-400/20 to-blue-400/5",
-  },
-  {
-    name: "JavaScript",
-    level: "Working Knowledge",
-    description:
-      "Modern web development with React, Next.js, Node.js and REST APIs.",
-    icon:
-      "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
-    accent: "from-yellow-300/20 to-orange-400/5",
-  },
-  {
-    name: "PHP",
-    level: "Working Knowledge",
-    description:
-      "Backend and web-development fundamentals with server-side programming.",
-    icon:
-      "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/php/php-original.svg",
-    accent: "from-purple-400/20 to-indigo-400/5",
-  },
-];
-
-/* =========================================================
-   EXPERIENCE
-========================================================= */
+const dv = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons";
+const skillIcons: Record<string, string> = {
+  "React.js": `${dv}/react/react-original.svg`,
+  "Next.js": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/nextdotjs.svg",
+  TypeScript: `${dv}/typescript/typescript-original.svg`,
+  JavaScript: `${dv}/javascript/javascript-original.svg`,
+  HTML: `${dv}/html5/html5-original.svg`,
+  CSS: `${dv}/css3/css3-original.svg`,
+  "Tailwind CSS": `${dv}/tailwindcss/tailwindcss-original.svg`,
+  "Node.js": `${dv}/nodejs/nodejs-original.svg`,
+  "Express.js": "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/express.svg",
+  "REST APIs": "/skills/rest-apis.svg",
+  JWT: "/skills/jwt.svg",
+  RBAC: "/skills/rbac.svg",
+  PostgreSQL: `${dv}/postgresql/postgresql-original.svg`,
+  "Prisma ORM": `${dv}/prisma/prisma-original.svg`,
+  "Neon Database": "/skills/neon-database.svg",
+  MySQL: `${dv}/mysql/mysql-original.svg`,
+  SQL: "/skills/sql.svg",
+  "Machine Learning": `${dv}/tensorflow/tensorflow-original.svg`,
+  "Computer Vision": `${dv}/opencv/opencv-original.svg`,
+  TensorFlow: `${dv}/tensorflow/tensorflow-original.svg`,
+  OpenCV: `${dv}/opencv/opencv-original.svg`,
+  DeepFace: "/skills/deepface.svg",
+  "C++": `${dv}/cplusplus/cplusplus-original.svg`,
+  C: `${dv}/c/c-original.svg`,
+  Python: `${dv}/python/python-original.svg`,
+  PHP: `${dv}/php/php-original.svg`,
+  Git: `${dv}/git/git-original.svg`,
+  GitHub: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg",
+  "VS Code": `${dv}/vscode/vscode-original.svg`,
+  Postman: `${dv}/postman/postman-original.svg`,
+  Vercel: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/vercel.svg",
+  Render: "https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/render.svg",
+};
 
 const experience = [
   {
-    year: "2026",
+    when: "Oct 2026 – Present",
+    status: "ongoing",
+    mode: "Virtual internship",
     role: "Virtual AI Intern",
-    company: "Infosys Springboard",
-    description:
-      "Selected for Infosys Springboard Virtual Internship 7.0 with structured learning and practical exposure across AI, machine learning and data-oriented problem solving.",
+    org: "Infosys Springboard",
+    text: "Currently working through Infosys Springboard Virtual Internship 7.0, a structured programme on AI, machine learning and data problem solving.",
+    points: [
+      "Selected for Virtual Internship 7.0 and started in October 2026.",
+      "Learning AI and machine learning concepts through guided modules.",
+      "Applying them in hands-on, data-oriented problem-solving tasks.",
+    ],
+    tags: ["Artificial Intelligence", "Machine Learning", "Data Problem Solving"],
   },
-
   {
-    year: "2025",
-    role: "MERN Stack Developer",
-    company: "Codec Technologies Pvt. Ltd.",
-    description:
-      "Worked remotely on full-stack development and contributed to campus-management product development using modern JavaScript technologies and REST APIs.",
+    when: "Oct 2026",
+    status: "done",
+    mode: "",
+    role: "Full Stack Developer Intern",
+    org: "InCodeVision",
+    text: "Worked as a full-stack developer intern and completed the internship in October 2026.",
+    points: [
+      "Worked across the front end, back end and database layers of the product.",
+      "Built and shipped features end to end as part of a development team.",
+      "Completed the internship in October 2026.",
+    ],
+    tags: ["Full Stack Development", "Front End", "Back End", "Databases"],
+  },
+  {
+    when: "2025",
+    status: "done",
+    mode: "Remote",
+    role: "MERN Stack Developer Intern",
+    org: "Codec Technologies Pvt. Ltd.",
+    text: "Worked remotely on full-stack development and contributed to a campus-management product using modern JavaScript technologies and REST APIs.",
+    points: [
+      "Worked remotely with a development team on a live product.",
+      "Contributed to the campus-management product using modern JavaScript.",
+      "Built and consumed REST APIs between the React front end and Node.js back end.",
+    ],
+    tags: ["React", "Node.js", "REST APIs", "MERN"],
   },
 ];
-
-/* =========================================================
-   EDUCATION
-========================================================= */
 
 const education = [
-  {
-    period: "2023 — 2027",
-    degree: "B.Tech — Computer Science & Engineering",
-    institute: "COER University, Roorkee",
-    result: "CGPA 8.63",
-  },
-
-  {
-    period: "2020 — 2022",
-    degree: "Senior Secondary — PCMB",
-    institute: "K S College, Ara",
-    result: "61.8%",
-  },
-
-  {
-    period: "2019 — 2020",
-    degree: "Matriculation",
-    institute: "B.D. Public School, Ara",
-    result: "63.2%",
-  },
+  { when: "2023 – 2027", title: "B.Tech, Computer Science & Engineering", org: "COER University, Roorkee", result: "CGPA 8.63" },
+  { when: "2020 – 2022", title: "Senior Secondary (PCMB)", org: "K S College, Ara", result: "61.8%" },
+  { when: "2019 – 2020", title: "Matriculation", org: "B.D. Public School, Ara", result: "63.2%" },
 ];
-
-/* =========================================================
-   CERTIFICATIONS
-========================================================= */
 
 const certifications = [
-  {
-    title: "Oracle Data Platform Certified Foundations Associate",
-    date: "September 2025",
-  },
-
-  {
-    title: "Internal Hackathon 4.0 — Participation",
-    date: "March 2025",
-  },
-
-  {
-    title: "Computing Fest by IITians — Achievement",
-    date: "March 2024",
-  },
+  ["Oracle Data Platform Certified Foundations Associate", "September 2025"],
+  ["Internal Hackathon 4.0, participant", "March 2025"],
+  ["Computing Fest by IITians, achievement", "March 2024"],
 ];
 
-/* =========================================================
-   STATS
-========================================================= */
+/* ======================= HELPERS ======================= */
 
-const stats = [
-  ["100+", "DSA Problems"],
-  ["30+", "REST APIs"],
-  ["10+", "Campus Modules"],
-  ["8.63", "Current CGPA"],
-];
+function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.55, delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
-/* =========================================================
-   REUSABLE ANIMATION
-========================================================= */
+function SectionHead({ title, sub }: { title: string; sub?: string }) {
+  return (
+    <Reveal className="mb-12 max-w-2xl">
+      <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">{title}</h2>
+      <motion.span
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="mt-4 block h-[3px] w-16 origin-left rounded bg-gradient-to-r from-cyan-400 to-purple-500"
+      />
+      {sub && <p className="mt-4 text-base leading-7 text-white/45">{sub}</p>}
+    </Reveal>
+  );
+}
 
-const revealInitial = {
-  opacity: 0,
-  y: 35,
+function IconLink({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-xs font-bold text-white/60 transition hover:border-cyan-400/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+    >
+      {children}
+    </a>
+  );
+}
+
+function CopyEmail() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      window.location.href = `mailto:${EMAIL}`;
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      className="flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3.5 text-sm font-semibold text-white/75 transition hover:border-cyan-400/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+    >
+      {copied ? <Check size={16} className="text-cyan-300" /> : <Copy size={16} />}
+      {copied ? "Email copied" : "Copy email"}
+    </button>
+  );
+}
+
+function Typewriter({ words }: { words: string[] }) {
+  const [i, setI] = useState(0);
+  const [text, setText] = useState("");
+  const [del, setDel] = useState(false);
+  useEffect(() => {
+    const w = words[i];
+    const t = setTimeout(
+      () => {
+        if (!del) {
+          setText(w.slice(0, text.length + 1));
+          if (text.length + 1 === w.length) setTimeout(() => setDel(true), 1200);
+        } else {
+          setText(w.slice(0, text.length - 1));
+          if (text.length - 1 === 0) { setDel(false); setI((i + 1) % words.length); }
+        }
+      },
+      del ? 40 : 85
+    );
+    return () => clearTimeout(t);
+  }, [text, del, i, words]);
+  return (
+    <span className="font-mono text-cyan-300">
+      {text}
+      <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-cyan-300" />
+    </span>
+  );
+}
+
+function CountUp({ value }: { value: string }) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [shown, setShown] = useState("0");
+  const num = parseFloat(value);
+  const suffix = value.replace(/[0-9.]/g, "");
+  const decimals = value.includes(".") ? 2 : 0;
+  useEffect(() => {
+    if (!inView) return;
+    const c = animate(0, num, { duration: 1.6, ease: "easeOut", onUpdate: (v) => setShown(v.toFixed(decimals)) });
+    return () => c.stop();
+  }, [inView, num, decimals]);
+  return <span ref={ref}>{shown}{suffix}</span>;
+}
+
+const spot = (e: React.MouseEvent<HTMLElement>) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
 };
 
-const revealVisible = {
-  opacity: 1,
-  y: 0,
-};
+/* ======================= GLOBAL STYLES (inline, no globals.css needed) ======================= */
 
-const revealTransition = {
-  duration: 0.65,
-};
+const GLOBAL_CSS = `.hero-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+}
+html { scroll-behavior: smooth; }
+.vk-grad { background: linear-gradient(90deg,#22d3ee,#a78bfa,#f0abfc,#22d3ee); background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  animation: vk-grad 5s linear infinite; }
+@keyframes vk-grad { to { background-position: 300% center; } }
+@keyframes vk-marquee { to { transform: translateX(-50%); } }
+.vk-marquee { animation: vk-marquee 40s linear infinite; }
+.vk-marquee:hover { animation-play-state: paused; }
+@keyframes vk-sheen { 0% { transform: translateX(-120%); } 60%,100% { transform: translateX(220%); } }
+.vk-sheen { position:absolute; inset:0; width:40%; pointer-events:none;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.07), transparent);
+  animation: vk-sheen 6s ease-in-out infinite; }
 
-/* =========================================================
-   HOME
-========================================================= */
 
-export default function Home() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileImageError, setProfileImageError] = useState(false);
-  const [showNavbar, setShowNavbar] = useState(true);
+/* Scanner sweeping over the profile photo */
+.vk-scan {
+  position: absolute; left: 0; right: 0; top: 0; height: 90px; z-index: 20;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(34,211,238,.22) 70%, rgba(34,211,238,.55) 100%);
+  border-bottom: 1px solid rgba(103,232,249,.9);
+  box-shadow: 0 6px 30px rgba(34,211,238,.45);
+  animation: vk-scan 3.6s cubic-bezier(.45,0,.55,1) infinite;
+}
+@keyframes vk-scan {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(calc(5 * 100%)); opacity: 0; }
+}
 
-  const lastScrollY = useRef(0);
-  const ticking = useRef(false);
+/* Mouse-follow spotlight on project cards */
+.vk-spot::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(34,211,238,.14), transparent 60%);
+  opacity: 0; transition: opacity .3s;
+}
+.vk-spot:hover::before { opacity: 1; }
+
+/* Rotating gradient ring around the photo */
+@keyframes vk-spin { to { transform: rotate(360deg); } }
+.vk-ring { animation: vk-spin 8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vk-scan, .vk-ring, .vk-marquee, .vk-sheen, .vk-grad { animation: none; }
+}
+`;
+
+function GlobalStyles() {
+  return <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />;
+}
+
+/* ======================= SCROLL PROGRESS ======================= */
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  return (
+    <motion.div
+      aria-hidden
+      style={{ scaleX }}
+      className="fixed left-0 right-0 top-0 z-[60] h-[2px] origin-left bg-gradient-to-r from-cyan-400 to-purple-500"
+    />
+  );
+}
+
+/* ======================= BACKGROUND EFFECTS ======================= */
+
+type P = { x: number; y: number; vx: number; vy: number; r: number };
+
+function BackgroundEffects() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const light = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (ticking.current) return;
+    const canvas = ref.current!;
+    const ctx = canvas.getContext("2d")!;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mouse = { x: -9999, y: -9999 };
+    const packets: { a: number; b: number; t: number }[] = [];
+    let w = 0, h = 0, raf = 0, pts: P[] = [];
 
-      ticking.current = true;
-
-      window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        const previousScrollY = lastScrollY.current;
-
-        // Always show the navbar at the very top.
-        if (currentScrollY <= 24) {
-          setShowNavbar(true);
-        } else if (currentScrollY > previousScrollY + 4) {
-          // Scrolling down: hide it so it never covers section content.
-          setShowNavbar(false);
-          setMobileOpen(false);
-        } else if (currentScrollY < previousScrollY - 4) {
-          // Scrolling up: bring it back.
-          setShowNavbar(true);
-        }
-
-        lastScrollY.current = currentScrollY;
-        ticking.current = false;
-      });
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.min(100, Math.floor((w * h) / 16000));
+      pts = Array.from({ length: n }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+        r: Math.random() * 1.4 + 0.5,
+      }));
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        if (!reduce) {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+          const dx = p.x - mouse.x, dy = p.y - mouse.y, d = Math.hypot(dx, dy);
+          if (d < 140 && d > 0) { p.x += (dx / d) * 0.9; p.y += (dy / d) * 0.9; }
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(125,230,255,0.65)";
+        ctx.fill();
+        for (let j = i + 1; j < pts.length; j++) {
+          const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
+          if (d < 120) {
+            ctx.strokeStyle = `rgba(34,211,238,${0.16 * (1 - d / 120)})`;
+            ctx.lineWidth = 0.7;
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+            if (!reduce && packets.length < 14 && Math.random() < 0.0008) packets.push({ a: i, b: j, t: 0 });
+          }
+        }
+        const md = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+        if (md < 170) {
+          ctx.strokeStyle = `rgba(168,85,247,${0.35 * (1 - md / 170)})`;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+        }
+      }
+      // data packets travelling along links
+      for (let k = packets.length - 1; k >= 0; k--) {
+        const pk = packets[k];
+        pk.t += 0.018;
+        const a = pts[pk.a], b = pts[pk.b];
+        if (!a || !b || pk.t >= 1) { packets.splice(k, 1); continue; }
+        const x = a.x + (b.x - a.x) * pk.t, y = a.y + (b.y - a.y) * pk.t;
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fillStyle = "rgba(34,211,238,0.12)"; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fillStyle = "#ffffff"; ctx.fill();
+      }
+      if (!reduce) raf = requestAnimationFrame(draw);
+    };
 
+    const move = (e: MouseEvent) => {
+      mouse.x = e.clientX; mouse.y = e.clientY;
+      if (light.current)
+        light.current.style.background = `radial-gradient(480px circle at ${e.clientX}px ${e.clientY}px, rgba(34,211,238,0.10), transparent 60%)`;
+    };
+    const leave = () => { mouse.x = mouse.y = -9999; };
+    resize(); draw();
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", move, { passive: true });
+    document.addEventListener("mouseleave", leave);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseleave", leave);
     };
   }, []);
 
-  const { scrollYProgress } = useScroll();
-
-  const heroY = useTransform(
-    scrollYProgress,
-    [0, 0.25],
-    [0, -100]
-  );
-
-  const heroOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.2],
-    [1, 0]
-  );
-
-  const navItems = [
-    ["About", "#about"],
-    ["Skills", "#skills"],
-    ["Languages", "#languages"],
-    ["Experience", "#experience"],
-    ["Projects", "#projects"],
-    ["Contact", "#contact"],
-  ];
+  const grain =
+    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#050505] text-white">
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#050505]">
+      {/* aurora */}
+      <motion.div
+        animate={{ x: [0, 120, 0], y: [0, 60, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -left-40 top-[6%] h-[560px] w-[560px] rounded-full bg-cyan-500/20 blur-[130px]"
+      />
+      <motion.div
+        animate={{ x: [0, -110, 0], y: [0, 90, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -right-32 top-[28%] h-[600px] w-[600px] rounded-full bg-purple-500/20 blur-[150px]"
+      />
+      <motion.div
+        animate={{ x: [0, 80, -40, 0], y: [0, -50, 30, 0] }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-[-180px] left-[30%] h-[460px] w-[620px] rounded-full bg-blue-500/15 blur-[140px]"
+      />
+      <canvas ref={ref} className="absolute inset-0 h-full w-full" />
+      <div ref={light} className="absolute inset-0" />
+      <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: grain }} />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.65)_100%)]" />
+    </div>
+  );
+}
 
-      {/* =====================================================
-          GLOBAL EFFECTS
-      ===================================================== */}
+/* ======================= ANIMATED NAME ======================= */
 
+function SplitText({ text, delay = 0, grad = false }: { text: string; delay?: number; grad?: boolean }) {
+  return (
+    <span aria-hidden className="inline-flex overflow-hidden pb-[0.08em]">
+      {text.split("").map((ch, i) => (
+        <motion.span
+          key={i}
+          initial={{ y: "110%", rotate: 8, opacity: 0 }}
+          animate={{ y: 0, rotate: 0, opacity: 1 }}
+          transition={{ delay: delay + i * 0.06, type: "spring", stiffness: 180, damping: 16 }}
+          style={grad ? { animationDelay: `${i * 0.18}s` } : undefined}
+          className={`inline-block ${grad ? "vk-grad" : ""}`}
+        >
+          {ch}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+/* ======================= CURSOR (simple dot + ring) ======================= */
+
+function CustomCursor() {
+  const [enabled, setEnabled] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const rx = useSpring(x, { stiffness: 260, damping: 26, mass: 0.4 });
+  const ry = useSpring(y, { stiffness: 260, damping: 26, mass: 0.4 });
+
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    setEnabled(true);
+    const style = document.createElement("style");
+    style.textContent = "html.vk-cursor, html.vk-cursor * { cursor: none !important; }";
+    document.head.appendChild(style);
+    document.documentElement.classList.add("vk-cursor");
+    const move = (e: MouseEvent) => { x.set(e.clientX); y.set(e.clientY); };
+    const over = (e: MouseEvent) =>
+      setHovering(!!(e.target as HTMLElement).closest("a,button,[role=button],input,textarea"));
+    window.addEventListener("mousemove", move, { passive: true });
+    window.addEventListener("mouseover", over);
+    return () => {
+      document.documentElement.classList.remove("vk-cursor");
+      style.remove();
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseover", over);
+    };
+  }, [x, y]);
+
+  if (!enabled) return null;
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-[9999]">
+      <motion.div
+        style={{ x: rx, y: ry, translateX: "-50%", translateY: "-50%" }}
+        animate={{ width: hovering ? 52 : 30, height: hovering ? 52 : 30 }}
+        transition={{ type: "spring", stiffness: 300, damping: 24 }}
+        className="absolute rounded-full border border-cyan-300/60"
+      />
+      <motion.div
+        style={{ x, y, translateX: "-50%", translateY: "-50%" }}
+        className="absolute h-1.5 w-1.5 rounded-full bg-cyan-300"
+      />
+    </div>
+  );
+}
+
+/* ======================= INTRO (role based loader) ======================= */
+
+function Intro({ onReveal, onDone }: { onReveal: () => void; onDone: () => void }) {
+  const roles = ["Full Stack Developer", "AI / ML Engineer", "Data Engineering Enthusiast"];
+  const [idx, setIdx] = useState(0);
+  const [pct, setPct] = useState(0);
+  const [closing, setClosing] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onReveal();
+      onDone();
+      return;
+    }
+    const swap = setInterval(() => setIdx((i) => Math.min(i + 1, roles.length - 1)), 950);
+    const c = animate(0, 100, {
+      duration: 3,
+      ease: "easeInOut",
+      onUpdate: (v) => setPct(Math.round(v)),
+      onComplete: () => {
+        setClosing(true);
+        setTimeout(onReveal, 350);
+        setTimeout(onDone, 1500);
+      },
+    });
+    return () => { clearInterval(swap); c.stop(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const ease = [0.76, 0, 0.24, 1] as const;
+
+  return (
+    <div className="fixed inset-0 z-[100]">
+      <motion.div
+        animate={{ y: closing ? "-100%" : "0%" }}
+        transition={{ duration: 0.9, ease }}
+        className="absolute inset-x-0 top-0 h-1/2 bg-[#050505]"
+      />
+      <motion.div
+        animate={{ y: closing ? "100%" : "0%" }}
+        transition={{ duration: 0.9, ease }}
+        className="absolute inset-x-0 bottom-0 h-1/2 bg-[#050505]"
+      />
+      <motion.div
+        animate={{ opacity: closing ? 0 : 1, scale: closing ? 1.06 : 1 }}
+        transition={{ duration: 0.35 }}
+        className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+      >
+        <div className="absolute h-[420px] w-[420px] rounded-full bg-cyan-500/15 blur-[120px]" />
+
+        <p className="relative font-mono text-xs text-cyan-300/70">
+          {"> initializing portfolio"}
+          <span className="ml-1 inline-block h-3 w-[2px] translate-y-[2px] animate-pulse bg-cyan-300" />
+        </p>
+
+        <div className="relative mt-8 flex min-h-[5.5rem] w-full max-w-xl items-center justify-center text-3xl font-bold tracking-tight sm:min-h-[4rem] sm:text-5xl">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={idx}
+              initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -24, filter: "blur(8px)" }}
+              transition={{ duration: 0.35 }}
+              className="block bg-gradient-to-r from-cyan-300 via-white to-purple-300 bg-clip-text text-transparent"
+            >
+              {roles[idx]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
+        <p className="relative mt-4 text-sm text-white/40">Vivek Kumar</p>
+
+        <div className="relative mt-10 w-64 sm:w-80">
+          <div className="h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="mt-3 font-mono text-xs text-white/40">{String(pct).padStart(3, "0")}%</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ======================= TECH MARQUEE ======================= */
+
+function Marquee() {
+  const items = Object.keys(skillIcons).filter((k) => skillIcons[k].startsWith("http"));
+  return (
+    <div className="overflow-hidden border-b border-white/5 py-6 [mask-image:linear-gradient(to_right,transparent,#000_12%,#000_88%,transparent)]">
+      <div className="vk-marquee flex w-max gap-3">
+        {[...items, ...items].map((k, i) => (
+          <span
+            key={`${k}-${i}`}
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-white/60"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={skillIcons[k]} alt="" className={`h-4 w-4 object-contain ${skillIcons[k].includes("simple-icons") ? "brightness-0 invert" : ""}`} />
+            {k}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ======================= PAGE ======================= */
+
+export default function Home() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = showIntro ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [showIntro]);
+  const lastY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y <= 24) setShowNavbar(true);
+        else if (y > lastY.current + 4) { setShowNavbar(false); setMobileOpen(false); }
+        else if (y < lastY.current - 4) setShowNavbar(true);
+        lastY.current = y;
+        ticking.current = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const pageContent = (
+    <main className="min-h-screen overflow-x-hidden bg-transparent text-white selection:bg-cyan-300/30">
       <BackgroundEffects />
       <CustomCursor />
       <ScrollProgress />
 
-      {/* =====================================================
-          NAVBAR
-      ===================================================== */}
-
+      {/* NAVBAR */}
       <header
-        className={`fixed left-0 right-0 top-0 z-50 transition-transform duration-300 ease-out ${
+        className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ${
           showNavbar ? "translate-y-0" : "-translate-y-[130%]"
         }`}
       >
-        <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
-
-          <nav className="rounded-2xl border border-white/10 bg-black/60 px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-
-            <div className="flex items-center justify-between">
-
-              <Link
-                href="#home"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3"
-              >
-                <motion.div
-                  whileHover={{
-                    scale: 1.08,
-                    rotate: 4,
-                  }}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10"
-                >
-                  <span className="text-sm font-bold text-cyan-300">
-                    VK
-                  </span>
-                </motion.div>
-
-                <div className="hidden sm:block">
-                  <p className="text-sm font-semibold tracking-wide">
-                    VIVEK KUMAR
-                  </p>
-
-                  <p className="text-[10px] tracking-[0.25em] text-white/40">
-                    SOFTWARE ENGINEER
-                  </p>
-                </div>
+        <div className="mx-auto mt-3 max-w-[1800px] px-3 sm:px-5 lg:px-8">
+          <nav className="rounded-2xl border border-white/10 bg-black/60 px-4 py-3.5 backdrop-blur-xl sm:px-6">
+            <div className="flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]">
+              <Link href="#home" onClick={() => setMobileOpen(false)} className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-sm font-bold text-cyan-300">
+                  VK
+                </span>
+                <span className="hidden text-base font-semibold sm:block">Vivek Kumar</span>
               </Link>
 
-              {/* DESKTOP */}
-
-              <div className="hidden items-center gap-7 md:flex">
+              <div className="hidden items-center gap-10 md:flex md:justify-self-center">
                 {navItems.map(([label, href]) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="group relative text-xs font-medium text-white/55 transition-colors hover:text-cyan-300"
-                  >
+                  <Link key={href} href={href} className="text-[15px] font-medium text-white/70 transition hover:text-cyan-300">
                     {label}
-
-                    <span className="absolute -bottom-2 left-0 h-px w-0 bg-cyan-300 transition-all duration-300 group-hover:w-full" />
                   </Link>
                 ))}
               </div>
 
-              {/* RESUME */}
-
-              <a
-                href="/resume/Vivek-Kumar-Resume.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="hidden items-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-3.5 py-2 text-xs font-semibold text-cyan-200 transition hover:border-cyan-400/40 hover:bg-cyan-400/10 md:flex"
-              >
-                <FileText size={14} />
-                Resume
-              </a>
-
-              {/* SOCIAL */}
-
-              <div className="hidden items-center gap-2 md:flex">
-
-                <motion.a
-                  whileHover={{
-                    y: -3,
-                    scale: 1.05,
-                  }}
-                  href="https://github.com/VIVEK6480"
+              <div className="hidden items-center gap-2.5 md:flex md:justify-self-end">
+                <IconLink href={GITHUB} label="GitHub">GH</IconLink>
+                <IconLink href={LINKEDIN} label="LinkedIn">in</IconLink>
+                <a
+                  href={RESUME}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="GitHub"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-white/60 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-white"
+                  className="ml-2 flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-cyan-300"
                 >
-                  <span className="text-[10px] font-bold">
-                    GH
-                  </span>
-                </motion.a>
-
-                <motion.a
-                  whileHover={{
-                    y: -3,
-                    scale: 1.05,
-                  }}
-                  href="https://www.linkedin.com/in/vivek-kumar-7162272b3"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="LinkedIn"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-white/60 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-white"
-                >
-                  <span className="text-[11px] font-bold">
-                    in
-                  </span>
-                </motion.a>
-
-                <motion.a
-                  whileHover={{
-                    scale: 1.04,
-                  }}
-                  href="mailto:2003kumarvivek@gmail.com"
-                  className="ml-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black transition hover:bg-cyan-300"
-                >
-                  Let's Talk
-                </motion.a>
-
+                  <FileText size={14} /> Resume
+                </a>
               </div>
-
-              {/* MOBILE */}
 
               <button
                 type="button"
                 aria-label="Toggle menu"
-                onClick={() =>
-                  setMobileOpen((value) => !value)
-                }
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 md:hidden"
+                aria-expanded={mobileOpen}
+                onClick={() => setMobileOpen((v) => !v)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 md:hidden"
               >
-                <AnimatePresence mode="wait" initial={false}>
-                  {mobileOpen ? (
-                    <motion.span
-                      key="close"
-                      initial={{
-                        opacity: 0,
-                        rotate: -90,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        rotate: 0,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        rotate: 90,
-                      }}
-                    >
-                      <X size={19} />
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="menu"
-                      initial={{
-                        opacity: 0,
-                        rotate: 90,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        rotate: 0,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        rotate: -90,
-                      }}
-                    >
-                      <Menu size={19} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                {mobileOpen ? <X size={19} /> : <Menu size={19} />}
               </button>
-
             </div>
-
-            {/* MOBILE MENU */}
 
             <AnimatePresence>
               {mobileOpen && (
                 <motion.div
-                  initial={{
-                    height: 0,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    height: "auto",
-                    opacity: 1,
-                  }}
-                  exit={{
-                    height: 0,
-                    opacity: 0,
-                  }}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden md:hidden"
                 >
                   <div className="mt-4 space-y-1 border-t border-white/10 pt-3">
-
                     {navItems.map(([label, href]) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={() =>
-                          setMobileOpen(false)
-                        }
-                        className="block rounded-xl px-3 py-3 text-sm text-white/65 transition hover:bg-white/5 hover:text-white"
-                      >
+                      <Link key={href} href={href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-3 text-sm text-white/65 hover:bg-white/5">
                         {label}
                       </Link>
                     ))}
-
-                    <a
-                      href="/resume/Vivek-Kumar-Resume.pdf"
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => setMobileOpen(false)}
-                      className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-3 py-3 text-sm font-semibold text-cyan-200"
-                    >
-                      <FileText size={16} />
-                      View Resume
+                    <a href={RESUME} target="_blank" rel="noreferrer" className="mt-2 block rounded-lg bg-white px-3 py-3 text-center text-sm font-semibold text-black">
+                      View resume
                     </a>
-
-                    <a
-                      href="mailto:2003kumarvivek@gmail.com"
-                      className="mt-2 block rounded-xl bg-white px-3 py-3 text-center text-sm font-semibold text-black"
-                    >
-                      Let's Talk
-                    </a>
-
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-
           </nav>
         </div>
       </header>
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
-
-      <section
-        id="home"
-        className="relative flex min-h-screen items-center overflow-hidden"
-      >
-
-        <div className="absolute inset-0 bg-[#050505]/80" />
-
-        <div className="hero-grid absolute inset-0 opacity-70" />
-
-        {/* atmosphere */}
-
-        <motion.div
-          animate={{
-            x: [0, 70, 0],
-            y: [0, 35, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 14,
-            repeat: Infinity,
-          }}
-          className="absolute left-[-15%] top-[10%] h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[130px]"
-        />
-
-        <motion.div
-          animate={{
-            x: [0, -60, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.12, 1],
-          }}
-          transition={{
-            duration: 17,
-            repeat: Infinity,
-          }}
-          className="absolute right-[-10%] top-[20%] h-[550px] w-[550px] rounded-full bg-purple-500/10 blur-[150px]"
-        />
-
-        {/* particles */}
-
-        <motion.div
-          animate={{
-            x: [0, 25, 0],
-            y: [0, -20, 0],
-          }}
-          transition={{
-            duration: 9,
-            repeat: Infinity,
-          }}
-          className="absolute left-[15%] top-[28%] h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_30px_8px_rgba(34,211,238,0.35)]"
-        />
-
-        <motion.div
-          animate={{
-            x: [0, -30, 0],
-            y: [0, 25, 0],
-          }}
-          transition={{
-            duration: 11,
-            repeat: Infinity,
-          }}
-          className="absolute right-[20%] top-[35%] h-1.5 w-1.5 rounded-full bg-purple-300 shadow-[0_0_25px_7px_rgba(168,85,247,0.35)]"
-        />
-
-        <motion.div
-          animate={{
-            y: [0, -25, 0],
-            opacity: [0.2, 0.8, 0.2],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-          }}
-          className="absolute left-[48%] top-[18%] h-1 w-1 rounded-full bg-white"
-        />
-
-        {/* content */}
-
-        <motion.div
-          style={{
-            y: heroY,
-            opacity: heroOpacity,
-          }}
-          className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 lg:px-8"
-        >
-
-          <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_.85fr]">
-
-            {/* LEFT */}
-
+      {/* HERO */}
+      <section id="home" className="relative flex min-h-[100svh] items-center overflow-hidden lg:h-[100svh] lg:min-h-[600px]">
+        <div className="hero-grid absolute inset-0 opacity-60" />
+        <div className="relative z-10 mx-auto w-full max-w-[1800px] px-6 pb-10 pt-24 lg:px-12">
+          <div className="grid items-center gap-8 lg:gap-14 lg:grid-cols-[1.2fr_.8fr]">
             <div>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 15,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  duration: 0.6,
-                }}
-                className="mb-7 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/5 px-4 py-2"
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/5 px-4 py-2 text-[11px] font-medium text-cyan-300 sm:text-xs"
               >
-
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-70" />
-
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
+                  <span className="absolute h-full w-full animate-ping rounded-full bg-cyan-400 opacity-70" />
+                  <span className="relative h-2 w-2 rounded-full bg-cyan-400" />
                 </span>
-
-                <span className="text-xs font-medium tracking-wide text-cyan-300">
-                  AVAILABLE FOR OPPORTUNITIES
-                </span>
-
-              </motion.div>
-
-              <motion.p
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.1,
-                  duration: 0.6,
-                }}
-                className="mb-4 text-sm font-medium uppercase tracking-[0.35em] text-white/35"
-              >
-                Hello, I&apos;m
+                Final-year student · open to roles from 2027
               </motion.p>
 
-              {/* NAME */}
-
-              <motion.h1
-                initial={{
-                  opacity: 0,
-                  y: 35,
-                  scale: 0.97,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                }}
-                transition={{
-                  delay: 0.15,
-                  duration: 0.8,
-                }}
-                className="max-w-4xl text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-7xl lg:text-[92px]"
+              <h1
+                aria-label="Vivek Kumar"
+                className="font-bold leading-[0.95] tracking-[-0.045em] text-[clamp(2.75rem,min(10vw,15vh),7rem)]"
               >
-                Vivek
+                <motion.span
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-1 block text-[0.3em] font-medium tracking-normal text-white/40"
+                >
+                  Hi, I&apos;m
+                </motion.span>
+                <SplitText text="Vivek" delay={0.2} />
                 <br />
+                <SplitText text="Kumar" delay={0.5} grad />
+              </h1>
 
-                <span className="hero-gradient">
-                  Kumar.
-                </span>
-              </motion.h1>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: -20,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-                transition={{
-                  delay: 0.3,
-                  duration: 0.6,
-                }}
-                className="mt-8 flex items-center gap-3"
-              >
-
-                <motion.div
-                  animate={{
-                    width: [48, 80, 48],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                  }}
-                  className="h-px bg-cyan-400"
-                />
-
-                <p className="text-sm font-medium text-white/70 sm:text-base">
-                  Full Stack Developer
-                  <span className="mx-2 text-white/20">
-                    /
-                  </span>
-                  AI Engineer
-                </p>
-
-              </motion.div>
+              <p className="mt-4 text-base sm:text-xl">
+                <span className="text-white/40">{"> "}</span>
+                <Typewriter words={["Full Stack Developer", "AI / ML Engineer", "Data Engineering Enthusiast", "Problem Solver"]} />
+              </p>
 
               <motion.p
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.4,
-                  duration: 0.6,
-                }}
-                className="mt-7 max-w-2xl text-base leading-8 text-white/45 sm:text-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="mt-4 max-w-xl text-sm leading-7 text-white/50 sm:text-base"
               >
-                I build scalable digital products, intelligent
-                systems and modern web applications with a focus
-                on clean architecture, real-world functionality
-                and exceptional user experience.
+                I&apos;m Vivek Kumar, a B.Tech CSE student at COER University. I ship with Next.js, Node.js and
+                PostgreSQL, and I work on data quality, observability and computer vision with Python.
               </motion.p>
 
-              {/* CTA */}
-
               <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.5,
-                  duration: 0.6,
-                }}
-                className="mt-9 flex flex-wrap gap-3"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="mt-6 flex flex-wrap gap-3"
               >
-
-                <motion.a
-                  whileHover={{
-                    scale: 1.04,
-                    y: -3,
-                  }}
-                  whileTap={{
-                    scale: 0.97,
-                  }}
-                  href="#projects"
-                  className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-black shadow-[0_10px_40px_rgba(255,255,255,0.08)] transition hover:bg-cyan-300"
-                >
-                  Explore Projects
-
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </motion.a>
-
-                <motion.a
-                  whileHover={{
-                    scale: 1.04,
-                    y: -3,
-                  }}
-                  whileTap={{
-                    scale: 0.97,
-                  }}
-                  href="/resume/Vivek-Kumar-Resume.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/5 px-5 py-3.5 text-sm font-semibold text-cyan-200 backdrop-blur transition hover:border-cyan-300/50 hover:bg-cyan-400/10"
-                >
-                  <Eye size={16} />
-                  View Resume
-                </motion.a>
-
-                <motion.a
-                  whileHover={{
-                    scale: 1.04,
-                    y: -3,
-                  }}
-                  whileTap={{
-                    scale: 0.97,
-                  }}
-                  href="/resume/Vivek-Kumar-Resume.pdf"
-                  download="Vivek-Kumar-Resume.pdf"
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-sm font-semibold text-white/75 backdrop-blur transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
-                >
-                  <Download size={16} />
-                  Download Resume
-                </motion.a>
-
-                <motion.a
-                  whileHover={{
-                    scale: 1.04,
-                    y: -3,
-                  }}
-                  whileTap={{
-                    scale: 0.97,
-                  }}
-                  href="mailto:2003kumarvivek@gmail.com"
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:border-cyan-400/30 hover:bg-cyan-400/5 hover:text-white"
-                >
-                  <Mail size={16} />
-                  Contact Me
-                </motion.a>
-
+                <a href="#projects" className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-300">
+                  See my projects
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </a>
+                <a href={RESUME} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/5 px-5 py-3 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/10">
+                  <Eye size={16} /> View resume
+                </a>
+                <a href={RESUME} download="Vivek-Kumar-Resume.pdf" className="flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition hover:text-white">
+                  <Download size={16} /> Download PDF
+                </a>
               </motion.div>
 
-              <motion.div
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                transition={{
-                  delay: 0.7,
-                  duration: 0.7,
-                }}
-                className="mt-9 flex flex-wrap items-center gap-5 text-xs text-white/35"
-              >
-
-                <span className="flex items-center gap-2">
-                  <MapPin size={14} />
-                  Haridwar, Uttarakhand
-                </span>
-
-                <span className="h-1 w-1 rounded-full bg-white/20" />
-
-                <span>
-                  100+ DSA Problems
-                </span>
-
-                <span className="h-1 w-1 rounded-full bg-white/20" />
-
-                <span>
-                  8.63 CGPA
-                </span>
-
-              </motion.div>
-
+              <p className="mt-5 flex items-center gap-2 text-xs text-white/35">
+                <MapPin size={14} /> Haridwar, Uttarakhand, India
+              </p>
             </div>
 
-            {/* PROFILE */}
-
+            {/* Profile */}
             <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.9,
-                x: 35,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                x: 0,
-              }}
-              transition={{
-                delay: 0.35,
-                duration: 0.8,
-              }}
-              className="relative mx-auto w-full max-w-md lg:ml-auto"
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              className="relative mx-auto w-full max-w-[17rem] sm:max-w-[20rem] lg:ml-auto lg:mr-0 lg:max-w-[min(26rem,calc(60svh*0.8))]"
             >
-
-              <motion.div
-                animate={{
-                  rotate: [0, 1, 0, -1, 0],
-                  y: [0, -6, 0, 6, 0],
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Infinity,
-                }}
-                className="absolute -inset-5 rounded-[40px] bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10 blur-2xl"
-              />
-
-              <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.035] p-3 shadow-2xl backdrop-blur-xl">
-
-                <div className="scan-line z-20" />
-
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-gradient-to-br from-cyan-950/50 via-[#0a0a0a] to-purple-950/40">
-
-                  {!profileImageError ? (
-                    <motion.img
-                      initial={{
-                        scale: 1.08,
-                      }}
-                      animate={{
-                        scale: [1.08, 1.03, 1.08],
-                      }}
-                      transition={{
-                        duration: 12,
-                        repeat: Infinity,
-                      }}
+              <div className="absolute -inset-5 rounded-[40px] bg-gradient-to-br from-cyan-500/15 via-transparent to-purple-500/15 blur-2xl" />
+              <div className="absolute -inset-[2px] overflow-hidden rounded-[26px]">
+                <div className="vk-ring absolute left-1/2 top-1/2 h-[160%] w-[160%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(34,211,238,.9)_60deg,transparent_120deg,rgba(168,85,247,.8)_220deg,transparent_280deg)]" />
+              </div>
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a] p-3">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-950/50 via-[#0a0a0a] to-purple-950/40">
+                  {!imgError ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
                       src="/profile/vivek-kumar.png"
-                      alt="Vivek Kumar"
-                      className="absolute inset-0 h-full w-full object-cover object-center"
-                      onError={() =>
-                        setProfileImageError(true)
-                      }
+                      alt="Portrait of Vivek Kumar"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      onError={() => setImgError(true)}
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-
-                      <div className="text-center">
-
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.06, 1],
-                          }}
-                          transition={{
-                            duration: 4,
-                            repeat: Infinity,
-                          }}
-                          className="mx-auto flex h-36 w-36 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/5 shadow-[0_0_80px_rgba(34,211,238,0.12)]"
-                        >
-                          <span className="text-5xl font-bold text-cyan-300">
-                            VK
-                          </span>
-                        </motion.div>
-
-                        <p className="mt-6 text-sm font-semibold">
-                          Vivek Kumar
-                        </p>
-
-                        <p className="mt-2 text-xs text-white/35">
-                          Full Stack Developer
-                        </p>
-
-                      </div>
-
-                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-cyan-300">VK</div>
                   )}
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
-
-                  <div className="absolute bottom-5 left-5 right-5">
-
-                    <motion.div
-                      whileHover={{
-                        y: -4,
-                      }}
-                      className="rounded-2xl border border-white/10 bg-black/45 p-4 backdrop-blur-xl"
-                    >
-
-                      <div className="flex items-center justify-between">
-
-                        <div>
-                          <p className="text-xs text-white/40">
-                            CURRENT FOCUS
-                          </p>
-
-                          <p className="mt-1 text-sm font-semibold">
-                            Full Stack + AI
-                          </p>
-                        </div>
-
-                        <motion.div
-                          animate={{
-                            rotate: [0, 15, -15, 0],
-                          }}
-                          transition={{
-                            duration: 4,
-                            repeat: Infinity,
-                          }}
-                        >
-                          <Sparkles
-                            size={20}
-                            className="text-cyan-300"
-                          />
-                        </motion.div>
-
-                      </div>
-
-                    </motion.div>
-
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="vk-scan" />
+                  <span className="absolute left-3 top-3 h-5 w-5 border-l-2 border-t-2 border-cyan-300/80" />
+                  <span className="absolute right-3 top-3 h-5 w-5 border-r-2 border-t-2 border-cyan-300/80" />
+                  <span className="absolute bottom-24 left-3 h-5 w-5 border-b-2 border-l-2 border-cyan-300/80" />
+                  <span className="absolute bottom-24 right-3 h-5 w-5 border-b-2 border-r-2 border-cyan-300/80" />
+                  <div className="absolute inset-x-4 bottom-4 rounded-xl border border-white/10 bg-black/50 p-4 backdrop-blur-xl">
+                    <p className="text-xs text-white/45">Currently building</p>
+                    <p className="mt-1 text-sm font-semibold">Data observability platform</p>
                   </div>
-
                 </div>
-
-                <div className="grid grid-cols-3 gap-2 p-2">
-
-                  {[
-                    ["100+", "DSA"],
-                    ["30+", "APIs"],
-                    ["10+", "Modules"],
-                  ].map(([value, label]) => (
-                    <motion.div
-                      key={label}
-                      whileHover={{
-                        y: -4,
-                        scale: 1.03,
-                      }}
-                      className="rounded-xl border border-white/5 bg-white/[0.025] p-3 text-center"
-                    >
-                      <p className="text-sm font-bold">
-                        {value}
-                      </p>
-
-                      <p className="mt-1 text-[9px] uppercase tracking-wider text-white/35">
-                        {label}
-                      </p>
-                    </motion.div>
-                  ))}
-
-                </div>
-
               </div>
-
             </motion.div>
-
           </div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              delay: 1,
-              duration: 0.8,
-            }}
-            className="mt-20 flex items-center justify-center"
-          >
+          <a href="#proof" aria-label="Scroll down" className="absolute bottom-2 left-1/2 hidden -translate-x-1/2 text-white/25 transition hover:text-cyan-300 lg:block">
+            <ArrowDown size={18} className="animate-bounce" />
+          </a>
+        </div>
+      </section>
 
-            <a
-              href="#about"
-              className="flex flex-col items-center gap-3 text-white/25 transition hover:text-cyan-300"
-            >
-              <span className="text-[9px] uppercase tracking-[0.35em]">
-                Scroll to explore
-              </span>
-
+      {/* PROOF STRIP */}
+      <section id="proof" className="border-y border-white/5 bg-white/[0.015]">
+        <dl className="mx-auto grid max-w-[1800px] grid-cols-2 px-6 py-4 sm:grid-cols-4 lg:px-12">
+          {stats.map(([value, label], i) => (
+            <div key={label} className={`flex flex-col items-center justify-center px-4 py-8 text-center sm:py-10 ${i % 2 ? "border-l border-white/5" : ""} ${i > 1 ? "border-t border-white/5 sm:border-t-0" : ""} ${i ? "sm:border-l sm:border-white/5" : "sm:border-l-0"}`}>
+              <dd className="text-4xl font-bold tracking-tight sm:text-5xl"><CountUp value={value} /></dd>
+              <dt className="mt-2 text-xs text-white/35">{label}</dt>
               <motion.span
-                animate={{
-                  y: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 1.6,
-                  repeat: Infinity,
-                }}
-              >
-                <ArrowDown size={16} />
-              </motion.span>
-            </a>
-
-          </motion.div>
-
-        </motion.div>
-
-      </section>
-
-      {/* =====================================================
-          STATS
-      ===================================================== */}
-
-      <section className="relative border-y border-white/5 bg-white/[0.015]">
-
-        <div className="mx-auto grid max-w-7xl grid-cols-2 px-6 py-10 sm:grid-cols-4 lg:px-8">
-
-          {stats.map(([value, label], index) => (
-            <motion.div
-              key={label}
-              initial={{
-                opacity: 0,
-                y: 20,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              viewport={{
-                once: true,
-              }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.08,
-              }}
-              whileHover={{
-                y: -5,
-              }}
-              className={`px-5 py-4 ${
-                index !== 0
-                  ? "border-l border-white/5"
-                  : ""
-              }`}
-            >
-
-              <p className="text-3xl font-bold tracking-tight sm:text-4xl">
-                {value}
-              </p>
-
-              <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-white/30">
-                {label}
-              </p>
-
-            </motion.div>
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.6, ease: "easeOut" }}
+                className="mt-4 block h-[2px] w-12 origin-center rounded bg-gradient-to-r from-cyan-400 to-purple-500"
+              />
+            </div>
           ))}
-
-        </div>
-
+        </dl>
       </section>
 
-      {/* =====================================================
-          ABOUT
-      ===================================================== */}
+      <Marquee />
 
-      <section
-        id="about"
-        className="relative py-28 sm:py-36"
-      >
+      {/* PROJECTS */}
+      <section id="projects" className="py-28 sm:py-32">
+        <div className="mx-auto max-w-[1800px] px-6 lg:px-12">
+          <SectionHead
+            title="Projects"
+            sub="One deep data-engineering project, plus full-stack and AI work that is deployed and open on GitHub."
+          />
 
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          {/* Flagship case study */}
+          <Reveal>
+            <article className="relative overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/[0.06] to-transparent p-6 sm:p-10">
+              <div className="vk-sheen" />
+              <p className="text-xs font-semibold text-cyan-300">Flagship project · Data engineering</p>
+              <h3 className="mt-3 max-w-3xl text-2xl font-bold tracking-tight sm:text-4xl">{flagship.title}</h3>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-white/55">{flagship.summary}</p>
 
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-              amount: 0.2,
-            }}
-            transition={revealTransition}
-            className="grid gap-16 lg:grid-cols-[.8fr_1.2fr]"
-          >
-
-            <div>
-
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                01 / About
-              </p>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-                Building with
-                <br />
-                <span className="text-white/30">
-                  purpose.
-                </span>
-              </h2>
-
-            </div>
-
-            <div>
-
-              <p className="text-xl leading-9 text-white/75 sm:text-2xl">
-                I&apos;m a Computer Science Engineering student
-                focused on full-stack development, backend
-                architecture and applied artificial intelligence.
-              </p>
-
-              <p className="mt-7 max-w-3xl text-base leading-8 text-white/40">
-                My work combines modern web technologies with
-                practical engineering principles. I enjoy turning
-                complex requirements into structured systems that
-                are reliable, scalable and easy to maintain.
-              </p>
-
-              <div className="mt-10 grid gap-3 sm:grid-cols-2">
-
-                {[
-                  "Scalable application architecture",
-                  "Role-based authentication systems",
-                  "REST API development",
-                  "AI & computer vision",
-                  "Database-driven applications",
-                  "Modern responsive interfaces",
-                ].map((item, index) => (
-                  <motion.div
-                    key={item}
-                    initial={{
-                      opacity: 0,
-                      x: -15,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      delay: index * 0.06,
-                    }}
-                    whileHover={{
-                      x: 5,
-                    }}
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.025] p-4"
+              <ol className="mt-9 grid gap-3 md:grid-cols-5">
+                {flagship.pipeline.map(([step, text], i) => (
+                  <motion.li
+                    key={step}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.12, duration: 0.45 }}
+                    className="rounded-xl border border-white/10 bg-black/30 p-4"
                   >
-
-                    <CheckCircle2
-                      size={17}
-                      className="shrink-0 text-cyan-300"
-                    />
-
-                    <span className="text-sm text-white/55">
-                      {item}
-                    </span>
-
-                  </motion.div>
+                    <p className="font-mono text-xs text-cyan-300">{i + 1}. {step}</p>
+                    <p className="mt-2 text-xs leading-5 text-white/45">{text}</p>
+                  </motion.li>
                 ))}
+              </ol>
 
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-xs text-white/35">{flagship.stack.join("  ·  ")}</p>
+                <a
+                  href={flagship.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-black transition hover:bg-cyan-300"
+                >
+                  Read the code <ArrowUpRight size={14} />
+                </a>
               </div>
+            </article>
+          </Reveal>
 
-            </div>
-
-          </motion.div>
-
+          {/* Other projects */}
+          <div className="mt-5 grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
+            {projects.map((p, i) => (
+              <Reveal key={p.title} delay={i * 0.06}>
+                <article onMouseMove={spot} className="vk-spot group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-cyan-400/25 hover:bg-white/[0.04]">
+                  <p className="text-xs text-white/35">{p.kind}</p>
+                  <h3 className="mt-2 text-xl font-semibold">{p.title}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-7 text-white/45">{p.description}</p>
+                  <p className="mt-5 text-xs text-white/30">{p.stack.join("  ·  ")}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {p.live && (
+                      <a href={p.live} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg bg-cyan-400/10 px-3.5 py-2 text-xs font-semibold text-cyan-200 transition hover:bg-cyan-400/20">
+                        Live demo <ArrowUpRight size={13} />
+                      </a>
+                    )}
+                    {p.github && (
+                      <a href={p.github} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2 text-xs font-medium text-white/60 transition hover:text-white">
+                        Source code <ArrowUpRight size={13} />
+                      </a>
+                    )}
+                    {!p.live && !p.github && <span className="text-xs text-white/30">Write-up coming soon</span>}
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </div>
-
       </section>
 
-      {/* =====================================================
-          SKILLS
-      ===================================================== */}
-
-      <section
-        id="skills"
-        className="border-y border-white/5 bg-[#070707] py-28 sm:py-36"
-      >
-
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-            }}
-            transition={revealTransition}
-          >
-
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              02 / Technical Stack
-            </p>
-
-            <div className="mt-5 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-
-              <h2 className="text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-                Tools I use to
-                <br />
-                <span className="text-white/30">
-                  ship products.
-                </span>
-              </h2>
-
-              <p className="max-w-md text-sm leading-7 text-white/35">
-                A practical stack covering frontend engineering,
-                backend systems, databases, AI/ML and developer
-                tooling.
-              </p>
-
-            </div>
-
-          </motion.div>
-
-          <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-
-            {skillGroups.map((group, index) => {
-
-              const Icon = group.icon;
-
+      {/* SKILLS */}
+      <section id="skills" className="border-y border-white/5 bg-[#070707]/70 py-28 sm:py-32">
+        <div className="mx-auto max-w-[1800px] px-6 lg:px-12">
+          <SectionHead
+            title="Skills"
+            sub="The tools I build with, grouped by where they sit in a product."
+          />
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {skillGroups.map((g, gi) => {
+              const Icon = groupIcons[g.title];
               return (
-                <motion.div
-                  key={group.title}
-                  initial={{
-                    opacity: 0,
-                    y: 30,
-                  }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  viewport={{
-                    once: true,
-                    amount: 0.15,
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    delay: index * 0.06,
-                  }}
-                  whileHover={{
-                    y: -7,
-                    scale: 1.015,
-                  }}
-                  className="group relative overflow-hidden rounded-2xl border border-white/7 bg-white/[0.025] p-6 transition-colors hover:border-cyan-400/20 hover:bg-white/[0.04]"
-                >
-
-                  <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-cyan-400/5 blur-3xl transition group-hover:bg-cyan-400/15" />
-
-                  <div className="relative flex items-center justify-between">
-
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-
-                      <Icon
-                        size={18}
-                        className="text-cyan-300"
-                      />
-
-                    </div>
-
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/20">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-
-                  </div>
-
-                  <h3 className="relative mt-6 flex items-center gap-2 text-lg font-semibold">
-                    {group.title}
-
-                    {group.title === "Tools" && (
-                      <span className="rounded-full border border-cyan-400/15 bg-cyan-400/5 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-cyan-300/60">
-                        Toolbox
+                <Reveal key={g.title} delay={gi * 0.07} className="h-full">
+                  <div
+                    onMouseMove={spot}
+                    className="vk-spot relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025] p-6 transition duration-300 hover:border-cyan-400/30 sm:p-7"
+                  >
+                    <div className="mb-6 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/25 bg-cyan-400/10 text-cyan-300">
+                          <Icon size={20} />
+                        </span>
+                        <h3 className="text-lg font-semibold">{g.title}</h3>
+                      </div>
+                      <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/40">
+                        {g.skills.length} tools
                       </span>
-                    )}
-                  </h3>
-
-                  <div className="relative mt-5">
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {group.skills.map((skill) => (
-                        <motion.div
-                          key={skill}
-                          whileHover={{
-                            y: -4,
-                            scale: 1.02,
-                          }}
-                          className="group/tool relative flex min-h-[82px] items-center gap-3 overflow-hidden rounded-xl border border-white/7 bg-black/25 px-3 py-3 transition-all duration-300 hover:border-cyan-400/25 hover:bg-cyan-400/[0.04]"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.035] via-transparent to-cyan-400/[0.025] opacity-0 transition-opacity duration-300 group-hover/tool:opacity-100" />
-
-                          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.035] p-2 transition-all duration-300 group-hover/tool:border-cyan-400/25 group-hover/tool:bg-white/[0.07]">
-                            <img
-                              src={skillIcons[skill]}
-                              alt={`${skill} logo`}
-                              loading="lazy"
-                              className="h-full w-full object-contain"
-                            />
-                          </div>
-
-                          <div className="relative min-w-0">
-                            <p className="truncate text-[11px] font-semibold text-white/70 transition-colors group-hover/tool:text-white">
-                              {skill}
-                            </p>
-
-                            <p className="mt-1 text-[8px] uppercase tracking-[0.13em] text-white/25">
-                              {group.title}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ))}
                     </div>
-                  </div>
 
-                </motion.div>
+                    <ul className="grid grid-cols-3 gap-3 xl:grid-cols-4">
+                      {g.skills.map((sk, si) => (
+                        <motion.li
+                          key={sk}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: gi * 0.05 + si * 0.05, type: "spring", stiffness: 240, damping: 18 }}
+                          whileHover={{ y: -5 }}
+                          className="group/tile flex flex-col items-center gap-2.5 rounded-2xl border border-white/10 bg-black/30 px-2 py-4 text-center transition-colors hover:border-cyan-400/40 hover:bg-cyan-400/[0.06]"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={skillIcons[sk]}
+                            alt={`${sk} logo`}
+                            loading="lazy"
+                            className={`h-9 w-9 object-contain transition-transform duration-300 group-hover/tile:scale-110 ${
+                              skillIcons[sk]?.includes("simple-icons") ? "brightness-0 invert" : ""
+                            }`}
+                          />
+                          <span className="text-[11px] font-medium leading-tight text-white/65 group-hover/tile:text-white">
+                            {sk}
+                          </span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
+                </Reveal>
               );
             })}
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* =====================================================
-          PROGRAMMING LANGUAGES
-      ===================================================== */}
-
-      <section
-        id="languages"
-        className="relative overflow-hidden border-y border-white/5 bg-white/[0.012] py-28 sm:py-36"
-      >
-        <div className="absolute left-1/2 top-0 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-cyan-500/[0.035] blur-[140px]" />
-
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-              amount: 0.2,
-            }}
-            transition={revealTransition}
-            className="mb-14 grid gap-8 lg:grid-cols-[.8fr_1.2fr]"
-          >
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                03 / Languages
-              </p>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-                Languages I
-                <br />
-                <span className="text-white/30">
-                  work with.
-                </span>
-              </h2>
-            </div>
-
-            <div className="flex items-end">
-              <p className="max-w-2xl text-base leading-8 text-white/45 sm:text-lg">
-                A focused set of programming languages used across
-                software development, problem solving, web applications,
-                backend systems and AI-oriented projects.
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {programmingLanguages.map((language, index) => (
-              <motion.div
-                key={language.name}
-                initial={{
-                  opacity: 0,
-                  y: 30,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                viewport={{
-                  once: true,
-                  amount: 0.15,
-                }}
-                transition={{
-                  duration: 0.55,
-                  delay: index * 0.08,
-                }}
-                whileHover={{
-                  y: -8,
-                }}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition duration-500 hover:border-cyan-400/30 hover:bg-white/[0.045]"
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${language.accent} opacity-0 transition duration-500 group-hover:opacity-100`}
-                />
-
-                <div className="relative">
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-black/40 p-3 shadow-xl transition duration-500 group-hover:scale-110 group-hover:border-cyan-400/30">
-                      <img
-                        src={language.icon}
-                        alt={`${language.name} logo`}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-
-                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-white/35">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-
-                  <h3 className="mt-6 text-xl font-bold">
-                    {language.name}
-                  </h3>
-
-                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/70">
-                    {language.level}
-                  </p>
-
-                  <p className="mt-4 min-h-[72px] text-sm leading-6 text-white/40">
-                    {language.description}
-                  </p>
-
-                  <div className="mt-5 h-px w-full bg-white/5" />
-
-                  <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-wider text-white/25">
-                    <span>Programming</span>
-
-                    <Code2
-                      size={13}
-                      className="text-cyan-300/50 transition group-hover:text-cyan-300"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* =====================================================
-          EXPERIENCE
-      ===================================================== */}
-
-      <section
-        id="experience"
-        className="py-28 sm:py-36"
-      >
-
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-            }}
-            transition={revealTransition}
-          >
-
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              03 / Experience
-            </p>
-
-            <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-              Experience &
-              <br />
-              <span className="text-white/30">
-                growth.
-              </span>
-            </h2>
-
-          </motion.div>
-
-          <div className="relative mt-16">
-
-            <div className="absolute bottom-0 left-[11px] top-0 w-px bg-gradient-to-b from-cyan-400/50 via-white/10 to-transparent" />
-
-            <div className="space-y-12">
-
-              {experience.map((item, index) => (
-                <motion.div
-                  key={item.company}
-                  initial={{
-                    opacity: 0,
-                    y: 30,
-                  }}
-                  whileInView={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  viewport={{
-                    once: true,
-                    amount: 0.2,
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    delay: index * 0.1,
-                  }}
-                  className="relative pl-10"
-                >
-
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.25, 1],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      delay: index,
-                    }}
-                    className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border border-cyan-400/40 bg-[#050505]"
-                  >
-                    <div className="h-2 w-2 rounded-full bg-cyan-300" />
-                  </motion.div>
-
-                  <motion.div
-                    whileHover={{
-                      y: -5,
-                    }}
-                    className="grid gap-6 rounded-2xl border border-white/7 bg-white/[0.02] p-6 transition hover:border-cyan-400/15 sm:p-8 lg:grid-cols-[180px_1fr]"
-                  >
-
+      {/* EXPERIENCE */}
+      <section id="experience" className="py-28 sm:py-32">
+        <div className="mx-auto max-w-[1800px] px-6 lg:px-12">
+          <SectionHead title="Experience" sub="Internships and hands-on work, newest first." />
+          <ol className="relative space-y-6 border-l border-white/10 pl-8">
+            {experience.map((e, i) => (
+              <Reveal key={e.org} delay={i * 0.08}>
+                <li className="relative">
+                  <span className="absolute -left-[39px] top-9 h-3 w-3 animate-pulse rounded-full border-2 border-cyan-300 bg-[#050505]" />
+                  <div className="grid gap-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition duration-300 hover:border-cyan-400/30 sm:p-8 lg:grid-cols-[300px_1fr] lg:gap-10">
                     <div>
-
-                      <p className="text-sm font-semibold text-cyan-300">
-                        {item.year}
+                      <p className="flex flex-wrap items-center gap-3 text-xs font-semibold text-cyan-300">
+                        {e.when}
+                        {e.status === "ongoing" ? (
+                          <span className="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+                              <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                            </span>
+                            Ongoing
+                          </span>
+                        ) : (
+                          <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-white/40">Completed</span>
+                        )}
                       </p>
-
-                      <p className="mt-2 text-xs uppercase tracking-[0.15em] text-white/25">
-                        {item.company}
-                      </p>
-
+                      <h4 className="mt-3 text-lg font-semibold text-white/90">{e.org}</h4>
+                      {e.mode && <p className="mt-1 text-xs text-white/35">{e.mode}</p>}
                     </div>
 
                     <div>
-
-                      <div className="flex items-center gap-3">
-
-                        <BriefcaseBusiness
-                          size={17}
-                          className="text-white/40"
-                        />
-
-                        <h3 className="text-xl font-semibold">
-                          {item.role}
-                        </h3>
-
+                      <h3 className="flex items-center gap-2.5 text-xl font-semibold sm:text-2xl">
+                        <BriefcaseBusiness size={19} className="shrink-0 text-white/40" /> {e.role}
+                      </h3>
+                      <p className="mt-3 max-w-3xl text-sm leading-7 text-white/50">{e.text}</p>
+                      <ul className="mt-4 space-y-2">
+                        {e.points.map((pt) => (
+                          <li key={pt} className="flex gap-2.5 text-sm leading-6 text-white/55">
+                            <Check size={15} className="mt-1 shrink-0 text-cyan-300" />
+                            {pt}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {e.tags.map((t) => (
+                          <span key={t} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] text-white/50">
+                            {t}
+                          </span>
+                        ))}
                       </div>
-
-                      <p className="mt-4 max-w-2xl text-sm leading-7 text-white/40">
-                        {item.description}
-                      </p>
-
                     </div>
+                  </div>
+                </li>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-                  </motion.div>
-
-                </motion.div>
+      {/* EDUCATION + CERTS */}
+      <section id="education" className="border-y border-white/5 bg-[#070707]/70 py-28 sm:py-32">
+        <div className="mx-auto grid max-w-[1800px] gap-16 px-6 lg:px-12 lg:grid-cols-2">
+          <div>
+            <SectionHead title="Education" />
+            <div className="space-y-4">
+              {education.map((e) => (
+                <Reveal key={e.org}>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="flex items-center gap-2 text-cyan-300"><GraduationCap size={14} /> {e.when}</span>
+                      <span className="text-white/40">{e.result}</span>
+                    </div>
+                    <h3 className="mt-3 font-semibold">{e.title}</h3>
+                    <p className="mt-1 text-sm text-white/40">{e.org}</p>
+                  </div>
+                </Reveal>
               ))}
-
             </div>
-
           </div>
 
-        </div>
-
-      </section>
-
-      {/* =====================================================
-          PROJECTS
-      ===================================================== */}
-
-      <section
-        id="projects"
-        className="border-y border-white/5 bg-[#070707] py-28 sm:py-36"
-      >
-
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-            }}
-            transition={revealTransition}
-            className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end"
-          >
-
-            <div>
-
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                04 / Selected Work
-              </p>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-                Projects that
-                <br />
-                <span className="text-white/30">
-                  solve problems.
-                </span>
-              </h2>
-
-            </div>
-
-            <p className="max-w-md text-sm leading-7 text-white/35">
-              From campus platforms to computer vision systems,
-              each project focuses on practical engineering and
-              functionality.
-            </p>
-
-          </motion.div>
-
-          <div className="mt-16 space-y-5">
-
-            {projects.map((project, index) => (
-              <motion.article
-                key={project.title}
-                initial={{
-                  opacity: 0,
-                  y: 35,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                viewport={{
-                  once: true,
-                  amount: 0.1,
-                }}
-                transition={{
-                  duration: 0.6,
-                  delay: index * 0.06,
-                }}
-                whileHover={{
-                  x: 6,
-                  scale: 1.005,
-                }}
-                className={`group relative overflow-hidden rounded-2xl border p-6 transition-all sm:p-8 ${
-                  project.featured
-                    ? "border-cyan-400/15 bg-gradient-to-r from-cyan-400/[0.055] to-transparent"
-                    : "border-white/7 bg-white/[0.02]"
-                }`}
-              >
-
-                <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-cyan-400/5 blur-3xl transition group-hover:bg-cyan-400/15" />
-
-                <div className="absolute inset-x-0 top-0 h-px -translate-x-full bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-
-                <div className="relative grid gap-8 lg:grid-cols-[90px_1fr_260px] lg:items-center">
-
-                  <div>
-                    <span className="font-mono text-sm text-cyan-300/60">
-                      {project.number}
+          <div>
+            <SectionHead title="Certifications" />
+            <div className="space-y-4">
+              {certifications.map(([title, date]) => (
+                <Reveal key={title}>
+                  <div className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-400/5 text-cyan-300">
+                      <Award size={17} />
                     </span>
-                  </div>
-
-                  <div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-
-                      <span className="rounded-full border border-white/7 bg-white/5 px-3 py-1 text-[9px] font-semibold tracking-[0.2em] text-white/35">
-                        {project.category}
-                      </span>
-
-                      {project.featured && (
-                        <span className="rounded-full border border-cyan-400/20 bg-cyan-400/5 px-3 py-1 text-[9px] font-semibold tracking-[0.2em] text-cyan-300">
-                          FEATURED
-                        </span>
-                      )}
-
+                    <div>
+                      <h3 className="text-sm font-semibold leading-6">{title}</h3>
+                      <p className="mt-1 text-xs text-white/35">{date}</p>
                     </div>
-
-                    <h3 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
-                      {project.title}
-                    </h3>
-
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-white/40">
-                      {project.description}
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-
-                      {project.stack.map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-[10px] text-white/25 transition group-hover:text-white/40"
-                        >
-                          #{tech}
-                        </span>
-                      ))}
-
-                    </div>
-
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-
-                    {project.github ? (
-                      <motion.a
-                        whileHover={{
-                          y: -3,
-                          scale: 1.03,
-                        }}
-                        href={project.github}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-xs font-medium text-white/55 transition hover:border-cyan-400/30 hover:bg-cyan-400/5 hover:text-white"
-                      >
-                        <span className="text-[10px] font-bold">
-                          GH
-                        </span>
-
-                        GitHub
-
-                        <ExternalLink size={12} />
-                      </motion.a>
-                    ) : null}
-
-                    {project.liveDemo ? (
-                      <motion.a
-                        whileHover={{
-                          y: -3,
-                          scale: 1.03,
-                        }}
-                        href={project.liveDemo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-4 py-3 text-xs font-semibold text-cyan-200 transition hover:border-cyan-300/40 hover:bg-cyan-400/10 hover:text-cyan-100"
-                      >
-                        <span className="text-[10px] font-bold">
-                          LIVE
-                        </span>
-
-                        Live Demo
-
-                        <ExternalLink size={12} />
-                      </motion.a>
-                    ) : !project.github ? (
-                      <span className="rounded-xl border border-white/7 px-4 py-3 text-xs text-white/25">
-                        Coming Soon
-                      </span>
-                    ) : null}
-
-                  </div>
-
-                </div>
-
-              </motion.article>
-            ))}
-
+                </Reveal>
+              ))}
+            </div>
           </div>
-
-        </div>
-
-      </section>
-
-      {/* =====================================================
-          ENGINEERING
-      ===================================================== */}
-
-      <section className="py-28 sm:py-36">
-
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-            }}
-            transition={revealTransition}
-            className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]"
-          >
-
-            <div>
-
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                05 / Engineering
-              </p>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em] sm:text-6xl">
-                How I
-                <br />
-                <span className="text-white/30">
-                  build.
-                </span>
-              </h2>
-
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-
-              {[
-                {
-                  icon: Network,
-                  title: "Architecture",
-                  text: "Modular and maintainable application structures.",
-                },
-                {
-                  icon: Zap,
-                  title: "Performance",
-                  text: "Fast interfaces and efficient backend workflows.",
-                },
-                {
-                  icon: Code2,
-                  title: "Clean Code",
-                  text: "Reusable components and predictable code patterns.",
-                },
-                {
-                  icon: BrainCircuit,
-                  title: "AI Integration",
-                  text: "Practical AI and computer vision applications.",
-                },
-              ].map((item, index) => {
-
-                const Icon = item.icon;
-
-                return (
-                  <motion.div
-                    key={item.title}
-                    initial={{
-                      opacity: 0,
-                      y: 25,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.08,
-                    }}
-                    whileHover={{
-                      y: -7,
-                      scale: 1.015,
-                    }}
-                    className="rounded-2xl border border-white/7 bg-white/[0.025] p-6 transition hover:border-cyan-400/20"
-                  >
-
-                    <Icon
-                      size={20}
-                      className="text-cyan-300"
-                    />
-
-                    <h3 className="mt-6 font-semibold">
-                      {item.title}
-                    </h3>
-
-                    <p className="mt-3 text-sm leading-6 text-white/35">
-                      {item.text}
-                    </p>
-
-                  </motion.div>
-                );
-              })}
-
-            </div>
-
-          </motion.div>
-
-        </div>
-
-      </section>
-
-      {/* =====================================================
-          EDUCATION + CERTIFICATIONS
-      ===================================================== */}
-
-      <section className="border-y border-white/5 bg-[#070707] py-28 sm:py-36">
-
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-
-          <div className="grid gap-16 lg:grid-cols-2">
-
-            {/* EDUCATION */}
-
-            <motion.div
-              initial={revealInitial}
-              whileInView={revealVisible}
-              viewport={{
-                once: true,
-              }}
-              transition={revealTransition}
-            >
-
-              <div className="flex items-center gap-3">
-
-                <GraduationCap
-                  size={20}
-                  className="text-cyan-300"
-                />
-
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                  Education
-                </p>
-
-              </div>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em]">
-                Academic
-                <br />
-                <span className="text-white/30">
-                  foundation.
-                </span>
-              </h2>
-
-              <div className="mt-10 space-y-4">
-
-                {education.map((item, index) => (
-                  <motion.div
-                    key={item.institute}
-                    initial={{
-                      opacity: 0,
-                      x: -20,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.08,
-                    }}
-                    whileHover={{
-                      x: 5,
-                    }}
-                    className="rounded-2xl border border-white/7 bg-white/[0.025] p-5"
-                  >
-
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-
-                      <span className="text-xs text-cyan-300">
-                        {item.period}
-                      </span>
-
-                      <span className="text-xs text-white/30">
-                        {item.result}
-                      </span>
-
-                    </div>
-
-                    <h3 className="mt-4 font-semibold">
-                      {item.degree}
-                    </h3>
-
-                    <p className="mt-2 text-sm text-white/35">
-                      {item.institute}
-                    </p>
-
-                  </motion.div>
-                ))}
-
-              </div>
-
-            </motion.div>
-
-            {/* CERTIFICATIONS */}
-
-            <motion.div
-              initial={revealInitial}
-              whileInView={revealVisible}
-              viewport={{
-                once: true,
-              }}
-              transition={revealTransition}
-            >
-
-              <div className="flex items-center gap-3">
-
-                <Award
-                  size={20}
-                  className="text-cyan-300"
-                />
-
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                  Certifications
-                </p>
-
-              </div>
-
-              <h2 className="mt-5 text-4xl font-bold tracking-[-0.04em]">
-                Credentials &
-                <br />
-                <span className="text-white/30">
-                  achievements.
-                </span>
-              </h2>
-
-              <div className="mt-10 space-y-4">
-
-                {certifications.map((item, index) => (
-                  <motion.div
-                    key={item.title}
-                    initial={{
-                      opacity: 0,
-                      x: 20,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.08,
-                    }}
-                    whileHover={{
-                      x: -5,
-                    }}
-                    className="group rounded-2xl border border-white/7 bg-white/[0.025] p-5 transition hover:border-cyan-400/20"
-                  >
-
-                    <div className="flex gap-4">
-
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-400/5 text-cyan-300">
-                        <Award size={17} />
-                      </div>
-
-                      <div>
-
-                        <h3 className="text-sm font-semibold leading-6">
-                          {item.title}
-                        </h3>
-
-                        <p className="mt-2 text-xs text-white/30">
-                          {item.date}
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                  </motion.div>
-                ))}
-
-              </div>
-
-            </motion.div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* =====================================================
-          RESUME
-      ===================================================== */}
-
-      <section
-        id="resume"
-        className="relative py-28 sm:py-36"
-      >
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-              amount: 0.2,
-            }}
-            transition={revealTransition}
-            className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.025] p-8 sm:p-12 lg:p-16"
-          >
-            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-500/10 blur-[100px]" />
-            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-purple-500/10 blur-[100px]" />
-
-            <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_auto]">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/5">
-                    <FileText
-                      size={20}
-                      className="text-cyan-300"
-                    />
-                  </div>
-
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                    Resume
-                  </p>
-                </div>
-
-                <h2 className="mt-6 text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
-                  Explore my
-                  <br />
-                  <span className="text-white/30">
-                    professional profile.
-                  </span>
-                </h2>
-
-                <p className="mt-6 max-w-2xl text-base leading-8 text-white/45">
-                  View my complete resume for my education, experience,
-                  projects, technical skills, certifications and
-                  achievements.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="/resume/Vivek-Kumar-Resume.pdf"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-cyan-300"
-                  >
-                    <Eye size={17} />
-                    View Resume
-                    <ArrowRight
-                      size={15}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </a>
-
-                  <a
-                    href="/resume/Vivek-Kumar-Resume.pdf"
-                    download="Vivek-Kumar-Resume.pdf"
-                    className="group flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-sm font-semibold text-white/75 transition hover:border-cyan-400/30 hover:bg-cyan-400/5 hover:text-white"
-                  >
-                    <Download
-                      size={17}
-                      className="transition-transform group-hover:-translate-y-1"
-                    />
-                    Download PDF
-                  </a>
-                </div>
-              </div>
-
-              <div className="relative mx-auto w-full max-w-[280px]">
-                <div className="absolute -inset-5 rounded-[30px] bg-cyan-400/10 blur-2xl" />
-
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-3 shadow-2xl">
-                  <div className="aspect-[3/4] overflow-hidden rounded-xl border border-white/5 bg-white/[0.03]">
-                    <div className="flex h-full flex-col">
-                      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                        <FileText
-                          size={17}
-                          className="text-cyan-300"
-                        />
-
-                        <span className="text-[9px] uppercase tracking-[0.2em] text-white/25">
-                          PDF
-                        </span>
-                      </div>
-
-                      <div className="flex flex-1 flex-col justify-center px-6">
-                        <div className="h-2 w-24 rounded-full bg-white/20" />
-                        <div className="mt-3 h-1.5 w-32 rounded-full bg-white/10" />
-
-                        <div className="mt-8 space-y-3">
-                          <div className="h-1.5 w-full rounded-full bg-white/10" />
-                          <div className="h-1.5 w-[85%] rounded-full bg-white/10" />
-                          <div className="h-1.5 w-[92%] rounded-full bg-white/10" />
-                          <div className="h-1.5 w-[72%] rounded-full bg-white/10" />
-                        </div>
-
-                        <div className="mt-8 grid grid-cols-2 gap-3">
-                          <div className="h-16 rounded-lg border border-white/5 bg-white/[0.025]" />
-                          <div className="h-16 rounded-lg border border-white/5 bg-white/[0.025]" />
-                        </div>
-
-                        <div className="mt-4 h-20 rounded-lg border border-white/5 bg-white/[0.025]" />
-                      </div>
-
-                      <div className="border-t border-white/10 px-4 py-3">
-                        <p className="text-center text-[8px] uppercase tracking-[0.2em] text-white/20">
-                          Vivek Kumar
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
-      {/* =====================================================
-          CONTACT
-      ===================================================== */}
-
-      <section
-        id="contact"
-        className="relative overflow-hidden py-32 sm:py-44"
-      >
-
-        <motion.div
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.25, 0.55, 0.25],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-          }}
-          className="absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/5 blur-[140px]"
-        />
-
-        <div className="relative mx-auto max-w-5xl px-6 text-center lg:px-8">
-
-          <motion.div
-            initial={revealInitial}
-            whileInView={revealVisible}
-            viewport={{
-              once: true,
-            }}
-            transition={revealTransition}
-          >
-
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              06 / Contact
-            </p>
-
-            <h2 className="mt-6 text-5xl font-bold tracking-[-0.05em] sm:text-7xl lg:text-8xl">
-              Let&apos;s build
-              <br />
-
-              <span className="hero-gradient">
-                something.
-              </span>
+      {/* CONTACT */}
+      <section id="contact" className="relative overflow-hidden py-32 sm:py-40">
+        <div className="relative mx-auto max-w-4xl px-6 text-center">
+          <Reveal>
+            <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
+              Hiring for 2027? Let&apos;s talk.
             </h2>
-
-            <p className="mx-auto mt-7 max-w-xl text-base leading-8 text-white/40">
-              Have a project, opportunity or idea? I&apos;m open
-              to conversations around software engineering,
-              full-stack development and AI.
+            <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/45">
+              I&apos;m looking for a software engineering role in full-stack, backend or data. Email is the fastest way to reach me.
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-3">
-
-              <motion.a
-                whileHover={{
-                  y: -4,
-                  scale: 1.04,
-                }}
-                whileTap={{
-                  scale: 0.97,
-                }}
-                href="mailto:2003kumarvivek@gmail.com"
-                className="flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-black transition hover:bg-cyan-300"
-              >
-                <Send size={16} />
-                Send an Email
-              </motion.a>
-
-              <motion.a
-                whileHover={{
-                  y: -4,
-                  scale: 1.04,
-                }}
-                href="https://www.linkedin.com/in/vivek-kumar-7162272b3"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-cyan-400/30 hover:text-white"
-              >
-                <span className="text-[11px] font-bold">
-                  in
-                </span>
-
+              <a href={`mailto:${EMAIL}`} className="flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-black transition hover:bg-cyan-300">
+                <Mail size={16} /> Send an email
+              </a>
+              <CopyEmail />
+              <a href={LINKEDIN} target="_blank" rel="noreferrer" className="rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:text-white">
                 LinkedIn
-              </motion.a>
-
-              <motion.a
-                whileHover={{
-                  y: -4,
-                  scale: 1.04,
-                }}
-                href="https://github.com/VIVEK6480"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-cyan-400/30 hover:text-white"
-              >
-                <span className="text-[10px] font-bold">
-                  GH
-                </span>
-
+              </a>
+              <a href={GITHUB} target="_blank" rel="noreferrer" className="rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:text-white">
                 GitHub
-              </motion.a>
-
-              <motion.a
-                whileHover={{
-                  y: -4,
-                  scale: 1.04,
-                }}
-                href="https://leetcode.com/u/6XsVSxqk70/"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-cyan-400/30 hover:text-white"
-              >
-                <span className="text-[10px] font-bold">
-                  LC
-                </span>
-
+              </a>
+              <a href={LEETCODE} target="_blank" rel="noreferrer" className="rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:text-white">
                 LeetCode
-              </motion.a>
-
+              </a>
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs text-white/25">
-
-              <span className="flex items-center gap-2">
-                <Mail size={13} />
-                2003kumarvivek@gmail.com
-              </span>
-
-              <span className="hidden h-1 w-1 rounded-full bg-white/20 sm:block" />
-
-              <span className="flex items-center gap-2">
-                <Phone size={13} />
-                +91 7281920282
-              </span>
-
-            </div>
-
-          </motion.div>
-
+            <p className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs text-white/30">
+              <span className="flex items-center gap-2"><Mail size={13} /> {EMAIL}</span>
+              <span className="flex items-center gap-2"><Phone size={13} /> +91 7281920282</span>
+            </p>
+          </Reveal>
         </div>
-
       </section>
 
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
+      {/* FOOTER */}
       <footer className="border-t border-white/5 bg-[#030303]">
-
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-
-          <div>
-
-            <p className="text-sm font-semibold">
-              Vivek Kumar
-            </p>
-
-            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-white/20">
-              Full Stack Developer / AI Engineer
-            </p>
-
-          </div>
-
-          <div className="flex items-center gap-4">
-
-            <a
-              href="https://github.com/VIVEK6480"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="GitHub"
-              className="text-white/30 transition hover:text-white"
-            >
-              <span className="text-[10px] font-bold">
-                GH
-              </span>
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/vivek-kumar-7162272b3"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="text-white/30 transition hover:text-white"
-            >
-              <span className="text-[11px] font-bold">
-                in
-              </span>
-            </a>
-
-            <a
-              href="https://leetcode.com/u/6XsVSxqk70/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LeetCode"
-              className="text-white/30 transition hover:text-white"
-            >
-              <span className="text-[10px] font-bold">
-                LC
-              </span>
-            </a>
-
-            <a
-              href="/resume/Vivek-Kumar-Resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Resume"
-              className="text-white/30 transition hover:text-cyan-300"
-            >
-              <FileText size={17} />
-            </a>
-
-            <a
-              href="mailto:2003kumarvivek@gmail.com"
-              aria-label="Email"
-              className="text-white/30 transition hover:text-white"
-            >
-              <Mail size={17} />
-            </a>
-
-          </div>
-
-          <p className="text-[10px] text-white/20">
-            © {new Date().getFullYear()} Vivek Kumar. Built with
-            Next.js.
-          </p>
-
+        <div className="mx-auto flex max-w-[1800px] flex-col gap-3 px-6 lg:px-12 py-8 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Vivek Kumar</p>
+          <a href={RESUME} target="_blank" rel="noreferrer" className="transition hover:text-cyan-300">Resume (PDF)</a>
         </div>
-
       </footer>
-
     </main>
+  );
+
+  return (
+    <>
+      <GlobalStyles />
+      {showIntro && <Intro onReveal={() => setRevealed(true)} onDone={() => setShowIntro(false)} />}
+      {revealed && pageContent}
+    </>
   );
 }
