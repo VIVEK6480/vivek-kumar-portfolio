@@ -991,7 +991,7 @@ export default function Home() {
           </Reveal>
 
           {/* Other projects */}
-          <div className="mt-5 grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
+          <div className="mt-5 grid gap-5 md:grid-cols-2">
             {projects.map((p, i) => (
               <Reveal key={p.title} delay={i * 0.06}>
                 <article onMouseMove={spot} className="vk-spot group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-cyan-400/25 hover:bg-white/[0.04]">
