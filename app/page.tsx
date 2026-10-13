@@ -1186,7 +1186,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <Reveal>
             <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
-              Hiring for 2027? Let&apos;s talk.
+              Open to roles from 2027. Let&apos;s talk.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/45">
               I&apos;m looking for a software engineering role in full-stack, backend or data. Email is the fastest way to reach me.
